@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Подсчет времени</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        
+        #container {
+            width: 90%; /* Ширина в процентах */
+            margin: 20px auto; /* Отступы сверху и снизу уменьшены */
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center; /* Центрировать содержимое */
+        }
+        
+        label {
+            display: inline-block;
+            width: 120px; /* Уменьшить ширину метки */
+        }
+        
+        input[type="text"] {
+            width: 200px;
+            height: 30px;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-left: 0px; /* Добавить отступ слева */
+        }
+        
+        .row {
+            margin-bottom: 20px;
+        }
+        
+        button[type="submit"] {
+            width: 100%;
+            height: 40px;
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 0;
+        }
+        
+        button[type="submit"]:hover {
+            background-color: #3e8e41;
+        }
+        
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
+            
+            margin: 0 auto; /* Центрировать по горизонтали */
+        }
+        
+        #result p {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        form {
+            margin-bottom: 0;
+        }
+        
+        @media (max-width: 768px) {
+            #container {
+                width: 95%;
+                padding: 10px;
+            }
+            
+            label {
+                width: 90px;
+            }
+            
+            input[type="text"] {
+                width: 150px;
+            }
+            
+            #result {
+                padding: 10px;
+            }
+            
+            #result p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h2>Подсчет времени</h2>
+        <form id="date-form">
+            <div class="row">
+                <label for="start-date">Первая дата:</label>
+                <input type="text" id="start-date" placeholder="ДД.ММ.ГГГГ" required>
+                <label for="end-date">Вторая дата:</label>
+                <input type="text" id="end-date" placeholder="ДД.ММ.ГГГГ" required>
+            </div>
+            
+            <div class="row">
+                <label for="start-time">Первое время:</label>
+                <input type="text" id="start-time" placeholder="ЧЧ:ММ" value="00:00">
+                <label for="end-time">Второе время:</label>
+                <input type="text" id="end-time" placeholder="ЧЧ:ММ" value="00:00">
+            </div>
+            
+            <button type="submit">Рассчитать</button>
+        </form>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('date-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const startDateInput = document.getElementById('start-date');
+            const startTimeInput = document.getElementById('start-time');
+            const endDateInput = document.getElementById('end-date');
+            const endTimeInput = document.getElementById('end-time');
+            
+            // Если пользователь не ввел время, оставляем значение по умолчанию
+            if (startTimeInput.value.trim() === '') {
+                startTimeInput.value = '00:00';
+            }
+            if (endTimeInput.value.trim() === '') {
+                endTimeInput.value = '00:00';
+            }
+            
+            const startDateStr = startDateInput.value + ' ' + startTimeInput.value;
+            const endDateStr = endDateInput.value + ' ' + endTimeInput.value;
+            
+            const startDate = new Date(startDateStr.replace(/(\d{2})\.(\d{2})\.(\d{4})/, '$3-$2-$1'));
+            const endDate = new Date(endDateStr.replace(/(\d{2})\.(\d{2})\.(\d{4})/, '$3-$2-$1'));
+            
+            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                document.getElementById('result').innerText = 'Неправильный формат даты или времени.';
+                return;
+            }
+            
+            if (startDate > endDate) {
+                document.getElementById('result').innerText = 'Дата и время начала должны быть раньше даты и времени конца.';
+                return;
+            }
+            
+            const diffMs = Math.abs(endDate - startDate);
+            const seconds = Math.floor(diffMs / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            const years = Math.floor(days / 365.25);
+            const remainingDays = Math.floor(days - years * 365.25);
+            
+            const resultHtml = `
+                <p>Промежуток между датами и временем:</p>
+		<p>- <b>${years}</b> лет и <b>${remainingDays}</b> дней</p>
+		<p>- <b>${days}</b> дней</p>
+		<p>- <b>${hours}</b> часов</p>
+		<p>- <b>${minutes}</b> минут</p>
+		<p>- <b>${seconds}</b> секунд</p>
+
+            `;
+            
+            document.getElementById('result').innerHTML = resultHtml;
+        });
+    </script>
+</body>
+</html>
