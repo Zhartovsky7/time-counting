@@ -104,16 +104,16 @@
         <form id="date-form">
             <div class="row">
                 <label for="start-date">Первая дата:</label>
-                <input type="text" id="start-date" placeholder="ДД.ММ.ГГГГ" required>
+                <input type="text" id="start-date" placeholder="ДДММГГГГ" required>
                 <label for="end-date">Вторая дата:</label>
-                <input type="text" id="end-date" placeholder="ДД.ММ.ГГГГ" required>
+                <input type="text" id="end-date" placeholder="ДДММГГГГ" required>
             </div>
             
             <div class="row">
                 <label for="start-time">Первое время:</label>
-                <input type="text" id="start-time" placeholder="ЧЧ:ММ" value="00:00">
+                <input type="text" id="start-time" placeholder="ЧЧММ" value="00:00">
                 <label for="end-time">Второе время:</label>
-                <input type="text" id="end-time" placeholder="ЧЧ:ММ" value="00:00">
+                <input type="text" id="end-time" placeholder="ЧЧММ" value="00:00">
             </div>
             
             <button type="submit">Рассчитать</button>
@@ -123,6 +123,50 @@
     </div>
 
     <script>
+        document.getElementById('start-date').addEventListener('input', function() {
+            const value = this.value.replace(/\D/g, '');
+            if (value.length > 8) {
+                this.value = value.substring(0, 8);
+            }
+            if (value.length === 2) {
+                this.value = `${value}.`;
+            } else if (value.length === 4) {
+                this.value = `${value.substring(0, 2)}.${value.substring(2)}.`;
+            }
+        });
+
+        document.getElementById('end-date').addEventListener('input', function() {
+            const value = this.value.replace(/\D/g, '');
+            if (value.length > 8) {
+                this.value = value.substring(0, 8);
+            }
+            if (value.length === 2) {
+                this.value = `${value}.`;
+            } else if (value.length === 4) {
+                this.value = `${value.substring(0, 2)}.${value.substring(2)}.`;
+            }
+        });
+
+        document.getElementById('start-time').addEventListener('input', function() {
+            const value = this.value.replace(/\D/g, '');
+            if (value.length > 4) {
+                this.value = value.substring(0, 4);
+            }
+            if (value.length === 2) {
+                this.value = `${value}:`;
+            }
+        });
+
+        document.getElementById('end-time').addEventListener('input', function() {
+            const value = this.value.replace(/\D/g, '');
+            if (value.length > 4) {
+                this.value = value.substring(0, 4);
+            }
+            if (value.length === 2) {
+                this.value = `${value}:`;
+            }
+        });
+
         document.getElementById('date-form').addEventListener('submit', function(event) {
             event.preventDefault();
             
@@ -131,19 +175,16 @@
             const endDateInput = document.getElementById('end-date');
             const endTimeInput = document.getElementById('end-time');
             
-            // Если пользователь не ввел время, оставляем значение по умолчанию
-            if (startTimeInput.value.trim() === '') {
-                startTimeInput.value = '00:00';
-            }
-            if (endTimeInput.value.trim() === '') {
-                endTimeInput.value = '00:00';
-            }
-            
             const startDateStr = startDateInput.value + ' ' + startTimeInput.value;
             const endDateStr = endDateInput.value + ' ' + endTimeInput.value;
             
-            const startDate = new Date(startDateStr.replace(/(\d{2})\.(\d{2})\.(\d{4})/, '$3-$2-$1'));
-            const endDate = new Date(endDateStr.replace(/(\d{2})\.(\d{2})\.(\d{4})/, '$3-$2-$1'));
+            const startDateParts = startDateStr.split(' ')[0].split('.');
+            const endDateParts = endDateStr.split(' ')[0].split('.');
+            
+            const startDate = new Date(startDateParts[2], startDateParts[1] - 1, startDateParts[0], 
+                                      parseInt(startTimeInput.value.split(':')[0]), parseInt(startTimeInput.value.split(':')[1]));
+            const endDate = new Date(endDateParts[2], endDateParts[1] - 1, endDateParts[0], 
+                                    parseInt(endTimeInput.value.split(':')[0]), parseInt(endTimeInput.value.split(':')[1]));
             
             if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
                 document.getElementById('result').innerText = 'Неправильный формат даты или времени.';
