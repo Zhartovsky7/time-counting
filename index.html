@@ -20,9 +20,18 @@
             text-align: center; /* Центрировать содержимое */
         }
         
-        label {
-            display: inline-block;
-            width: 120px; /* Уменьшить ширину метки */
+        .row {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-group label {
+            margin-right: 10px;
         }
         
         input[type="text"] {
@@ -31,11 +40,6 @@
             margin-bottom: 20px;
             padding: 10px;
             border: 1px solid #ccc;
-            margin-left: 0px; /* Добавить отступ слева */
-        }
-        
-        .row {
-            margin-bottom: 20px;
         }
         
         button[type="submit"] {
@@ -75,17 +79,22 @@
         }
         
         @media (max-width: 768px) {
-            #container {
-                width: 95%;
-                padding: 10px;
+            .row {
+                flex-direction: column;
             }
             
-            label {
-                width: 90px;
+            .input-group {
+                margin-bottom: 20px;
             }
             
             input[type="text"] {
-                width: 150px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            #container {
+                width: 95%;
+                padding: 10px;
             }
             
             #result {
@@ -103,17 +112,25 @@
         <h2>Подсчет времени</h2>
         <form id="date-form">
             <div class="row">
-                <label for="start-date">Первая дата:</label>
-                <input type="text" id="start-date" placeholder="ДДММГГГГ" required>
-                <label for="end-date">Вторая дата:</label>
-                <input type="text" id="end-date" placeholder="ДДММГГГГ" required>
+                <div class="input-group">
+                    <label for="start-date">Первая дата:</label>
+                    <input type="text" id="start-date" placeholder="ДДММГГГГ" required>
+                </div>
+                <div class="input-group">
+                    <label for="end-date">Вторая дата:</label>
+                    <input type="text" id="end-date" placeholder="ДДММГГГГ" required>
+                </div>
             </div>
             
             <div class="row">
-                <label for="start-time">Первое время:</label>
-                <input type="text" id="start-time" placeholder="ЧЧММ" value="00:00">
-                <label for="end-time">Второе время:</label>
-                <input type="text" id="end-time" placeholder="ЧЧММ" value="00:00">
+                <div class="input-group">
+                    <label for="start-time">Первое время:</label>
+                    <input type="text" id="start-time" placeholder="ЧЧММ" value="00:00">
+                </div>
+                <div class="input-group">
+                    <label for="end-time">Второе время:</label>
+                    <input type="text" id="end-time" placeholder="ЧЧММ" value="00:00">
+                </div>
             </div>
             
             <button type="submit">Рассчитать</button>
