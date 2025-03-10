@@ -7,18 +7,11 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
-            margin: 0;
-        }
-        
-        #main-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
         }
         
         #container {
             width: 90%; /* Ширина в процентах */
+            margin: 20px auto; /* Отступы сверху и снизу уменьшены */
             padding: 20px;
             background-color: #fff;
             border: 1px solid #ddd;
@@ -86,16 +79,6 @@
         }
         
         @media (max-width: 768px) {
-            #main-container {
-                flex-direction: column;
-            }
-            
-            #container {
-                width: 95%;
-                padding: 10px;
-                margin: 0 auto;
-            }
-            
             .row {
                 flex-direction: column;
             }
@@ -109,6 +92,11 @@
                 box-sizing: border-box;
             }
             
+            #container {
+                width: 95%;
+                padding: 10px;
+            }
+            
             #result {
                 padding: 10px;
             }
@@ -120,37 +108,35 @@
     </style>
 </head>
 <body>
-    <div id="main-container">
-        <div id="container">
-            <h2>Подсчет времени</h2>
-            <form id="date-form">
-                <div class="row">
-                    <div class="input-group">
-                        <label for="start-date">Первая дата:</label>
-                        <input type="text" id="start-date" placeholder="ДДММГГГГ" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="end-date">Вторая дата:</label>
-                        <input type="text" id="end-date" placeholder="ДДММГГГГ" required>
-                    </div>
+    <div id="container">
+        <h2>Подсчет времени</h2>
+        <form id="date-form">
+            <div class="row">
+                <div class="input-group">
+                    <label for="start-date">Первая дата:</label>
+                    <input type="text" id="start-date" placeholder="ДДММГГГГ" required>
                 </div>
-                
-                <div class="row">
-                    <div class="input-group">
-                        <label for="start-time">Первое время:</label>
-                        <input type="text" id="start-time" placeholder="ЧЧММ" value="00:00">
-                    </div>
-                    <div class="input-group">
-                        <label for="end-time">Второе время:</label>
-                        <input type="text" id="end-time" placeholder="ЧЧММ" value="00:00">
-                    </div>
+                <div class="input-group">
+                    <label for="end-date">Вторая дата:</label>
+                    <input type="text" id="end-date" placeholder="ДДММГГГГ" required>
                 </div>
-                
-                <button type="submit">Рассчитать</button>
-            </form>
+            </div>
             
-            <div id="result"></div>
-        </div>
+            <div class="row">
+                <div class="input-group">
+                    <label for="start-time">Первое время:</label>
+                    <input type="text" id="start-time" placeholder="ЧЧММ" value="00:00">
+                </div>
+                <div class="input-group">
+                    <label for="end-time">Второе время:</label>
+                    <input type="text" id="end-time" placeholder="ЧЧММ" value="00:00">
+                </div>
+            </div>
+            
+            <button type="submit">Рассчитать</button>
+        </form>
+        
+        <div id="result"></div>
     </div>
 
     <script>
@@ -182,4 +168,70 @@
             const value = this.value.replace(/\D/g, '');
             if (value.length > 4) {
                 this.value = value.substring(0, 4);
+            }
+            if (value.length === 2) {
+                this.value = `${value}:`;
+            }
+        });
 
+        document.getElementById('end-time').addEventListener('input', function() {
+            const value = this.value.replace(/\D/g, '');
+            if (value.length > 4) {
+                this.value = value.substring(0, 4);
+            }
+            if (value.length === 2) {
+                this.value = `${value}:`;
+            }
+        });
+
+        document.getElementById('date-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const startDateInput = document.getElementById('start-date');
+            const startTimeInput = document.getElementById('start-time');
+            const endDateInput = document.getElementById('end-date');
+            const endTimeInput = document.getElementById('end-time');
+            
+            const startDateStr = startDateInput.value + ' ' + startTimeInput.value;
+            const endDateStr = endDateInput.value + ' ' + endTimeInput.value;
+            
+            const startDateParts = startDateStr.split(' ')[0].split('.');
+            const endDateParts = endDateStr.split(' ')[0].split('.');
+            
+            const startDate = new Date(startDateParts[2], startDateParts[1] - 1, startDateParts[0], 
+                                      parseInt(startTimeInput.value.split(':')[0]), parseInt(startTimeInput.value.split(':')[1]));
+            const endDate = new Date(endDateParts[2], endDateParts[1] - 1, endDateParts[0], 
+                                    parseInt(endTimeInput.value.split(':')[0]), parseInt(endTimeInput.value.split(':')[1]));
+            
+            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                document.getElementById('result').innerText = 'Неправильный формат даты или времени.';
+                return;
+            }
+            
+            if (startDate > endDate) {
+                document.getElementById('result').innerText = 'Дата и время начала должны быть раньше даты и времени конца.';
+                return;
+            }
+            
+            const diffMs = Math.abs(endDate - startDate);
+            const seconds = Math.floor(diffMs / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            const years = Math.floor(days / 365.25);
+            const remainingDays = Math.floor(days - years * 365.25);
+            
+            const resultHtml = `
+                <p>Промежуток между датами и временем:</p>
+                <p>- <b>${years}</b> лет и <b>${remainingDays}</b> дней</p>
+                <p>- <b>${days}</b> дней</p>
+                <p>- <b>${hours}</b> часов</p>
+                <p>- <b>${minutes}</b> минут</p>
+                <p>- <b>${seconds}</b> секунд</p>
+            `;
+            
+            document.getElementById('result').innerHTML = resultHtml;
+        });
+    </script>
+</body>
+</html>
